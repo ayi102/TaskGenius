@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Local database (each machine has its own)
+*.db
+*.db-journal
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+
+# Env files
+.env

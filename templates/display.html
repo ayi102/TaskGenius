@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TaskGenius</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/display.css') }}">
+</head>
+<body>
+  <header class="display-header">
+    <div class="brand">TaskGenius</div>
+    <div class="header-meta">
+      <span id="date" class="date"></span>
+      <span class="clock" id="clock"></span>
+    </div>
+  </header>
+
+  <main id="board" class="board" aria-live="polite">
+    <p class="loading">Loading…</p>
+  </main>
+
+  <script src="{{ url_for('static', filename='js/display.js') }}"></script>
+</body>
+</html>

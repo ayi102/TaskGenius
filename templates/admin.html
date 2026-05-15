@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TaskGenius · Admin</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body>
+  <header class="admin-header">
+    <h1>TaskGenius</h1>
+    <a class="view-display" href="{{ url_for('display') }}" target="_blank" rel="noopener">Display ↗</a>
+  </header>
+
+  {% if errors %}
+    <div class="errors">
+      {% for e in errors %}<p>{{ e }}</p>{% endfor %}
+    </div>
+  {% endif %}
+
+  <section class="card">
+    <h2>Add a task</h2>
+    <form method="post" action="{{ url_for('create_task') }}" class="task-form">
+      <label>
+        <span>Title</span>
+        <input type="text" name="title" required maxlength="120"
+               value="{{ form.title or '' }}" placeholder="e.g. Bottle feed">
+      </label>
+
+      <div class="row">
+        <label class="flex-2">
+          <span>Category</span>
+          <select name="category" required>
+            <option value="" disabled {% if not form.category %}selected{% endif %}>Pick one</option>
+            {% for c in categories %}
+              <option value="{{ c }}" {% if form.category == c %}selected{% endif %}>{{ c|capitalize }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label class="flex-1">
+          <span>Time <small>(optional)</small></span>
+          <input type="time" name="scheduled_time" value="{{ form.scheduled_time or '' }}">
+        </label>
+      </div>
+
+      <label>
+        <span>Notes <small>(optional)</small></span>
+        <textarea name="notes" rows="2" maxlength="400"
+                  placeholder="e.g. 4oz formula, blue can">{{ form.notes or '' }}</textarea>
+      </label>
+
+      <button type="submit" class="primary">Add task</button>
+    </form>
+  </section>
+
+  <section class="card">
+    <h2>Tasks <span class="count">{{ tasks|length }}</span></h2>
+
+    {% if tasks|length == 0 %}
+      <p class="empty">No tasks yet. Add one above.</p>
+    {% else %}
+      <ul class="task-list">
+        {% for t in tasks %}
+          <li class="task-row" data-category="{{ t.category }}">
+            {% if editing_id == t.id %}
+              <form method="post" action="{{ url_for('edit_task', task_id=t.id) }}" class="task-form inline">
+                <input type="text" name="title" required maxlength="120" value="{{ form.title or t.title }}">
+                <div class="row">
+                  <select name="category" required class="flex-2">
+                    {% for c in categories %}
+                      <option value="{{ c }}" {% if (form.category or t.category) == c %}selected{% endif %}>{{ c|capitalize }}</option>
+                    {% endfor %}
+                  </select>
+                  <input type="time" name="scheduled_time" class="flex-1" value="{{ form.scheduled_time or t.scheduled_time or '' }}">
+                </div>
+                <textarea name="notes" rows="2" maxlength="400">{{ form.notes if form.notes is not none else t.notes }}</textarea>
+                <div class="actions">
+                  <button type="submit" class="primary">Save</button>
+                  <a class="ghost" href="{{ url_for('admin') }}">Cancel</a>
+                </div>
+              </form>
+            {% else %}
+              <div class="task-summary">
+                <div class="task-line">
+                  <span class="time">{{ t.scheduled_time or '—' }}</span>
+                  <span class="category">{{ t.category }}</span>
+                  <span class="title">{{ t.title }}</span>
+                </div>
+                {% if t.notes %}<p class="notes">{{ t.notes }}</p>{% endif %}
+              </div>
+              <div class="actions">
+                <a class="ghost" href="{{ url_for('admin') }}?edit={{ t.id }}">Edit</a>
+                <form method="post" action="{{ url_for('delete_task', task_id=t.id) }}"
+                      onsubmit="return confirm('Delete this task?');">
+                  <button type="submit" class="danger">Delete</button>
+                </form>
+              </div>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </section>
+
+</body>
+</html>
