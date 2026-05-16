@@ -27,6 +27,7 @@ html, body {
   padding: 0;
   height: 100%;
   overflow: hidden;
+  cursor: none;
   color: var(--text);
   background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bot) 100%);
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Helvetica, Arial, sans-serif;

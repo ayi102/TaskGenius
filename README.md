@@ -54,7 +54,7 @@ TaskGenius launch into kiosk mode on boot.
 
 ```bash
 sudo apt update
-sudo apt install -y git python3-venv chromium unclutter
+sudo apt install -y git python3-venv chromium
 
 cd ~
 git clone https://github.com/ayi102/TaskGenius.git taskgenius
@@ -133,7 +133,7 @@ cat > ~/.config/autostart/taskgenius-kiosk.desktop << 'EOF'
 Type=Application
 Name=TaskGenius Kiosk
 Comment=Full-screen Chromium pointing at the local TaskGenius display
-Exec=/bin/bash -c "until curl -sSf -o /dev/null http://localhost:5000/; do sleep 1; done; unclutter -idle 0 -root & chromium --noerrdialogs --disable-infobars --kiosk --autoplay-policy=no-user-gesture-required --disable-features=TranslateUI --disable-session-crashed-bubble --disable-pinch --overscroll-history-navigation=0 --check-for-update-interval=31536000 http://localhost:5000/"
+Exec=/bin/bash -c "until curl -sSf -o /dev/null http://localhost:5000/; do sleep 1; done; while true; do chromium --noerrdialogs --disable-infobars --kiosk --autoplay-policy=no-user-gesture-required --disable-features=TranslateUI --disable-session-crashed-bubble --disable-pinch --overscroll-history-navigation=0 --check-for-update-interval=31536000 http://localhost:5000/; sleep 2; done"
 X-GNOME-Autostart-enabled=true
 EOF
 ```
@@ -143,11 +143,19 @@ Notes on what the `Exec` line does:
 - `until curl … http://localhost:5000/; do sleep 1; done` — wait until the
   Flask server is responding before launching the browser, so a slow boot
   doesn't land you on a "site can't be reached" page.
-- `unclutter -idle 0 -root` — hides the mouse cursor instantly.
+- `while true; do chromium … ; sleep 2; done` — auto-relaunches Chromium if
+  it dies or you kill it. Handy for forcing a CSS/JS reload after pushing
+  new code: `ssh ayi102@<pi-ip> 'pkill chromium'` and the loop brings it
+  back with the fresh assets.
 - The Chromium flags suppress all browser chrome (infobars, error dialogs,
   translate prompt, crash-restore prompt), disable pinch-zoom and overscroll
   swipe-navigation, and turn off update checks so they don't interrupt the
   display.
+
+> **Cursor hiding:** Pi OS Bookworm on Pi 4/5 ships with a Wayland compositor
+> (`labwc`), which X11-era tools like `unclutter` cannot talk to. Instead the
+> cursor is hidden via `cursor: none` in `static/css/display.css`, which
+> works in any compositor.
 
 For this to take effect the Pi must boot to the desktop with autologin
 enabled (this is the default for Pi OS with desktop). Set it via
