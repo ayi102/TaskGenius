@@ -72,18 +72,43 @@ function pickCurrent(timed, now) {
   return best;
 }
 
+function pickNext(timed, now) {
+  let best = null;
+  let bestMins = Infinity;
+  for (const t of timed) {
+    const mins = toMinutes(t.scheduled_time);
+    if (mins > now && mins < bestMins) {
+      best = t;
+      bestMins = mins;
+    }
+  }
+  return best;
+}
+
+function formatUntil(mins) {
+  if (mins < 1) return "now";
+  if (mins < 60) return `in ${mins} min`;
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  return m === 0 ? `in ${h}h` : `in ${h}h ${m}m`;
+}
+
 /* ─── Today rendering ──────────────────────────────────── */
 
-function renderHero(t) {
+function renderHero(t, kind, untilMins) {
   const notes = t.notes
     ? `<div class="hero-notes">${escape(t.notes)}</div>`
     : "";
+  const tag = kind === "now"
+    ? "◀ NOW"
+    : `▶ NEXT UP · ${formatUntil(untilMins)}`;
+  const timePrefix = kind === "now" ? "▶ " : "";
   return `
-    <div class="hero" data-category="${escape(t.category)}">
+    <div class="hero is-${kind}" data-category="${escape(t.category)}">
       <div class="hero-top">
-        <span class="hero-time">${escape(format12hr(t.scheduled_time))}</span>
+        <span class="hero-time">${timePrefix}${escape(format12hr(t.scheduled_time))}</span>
         <span class="hero-category">${escape(t.category)}</span>
-        <span class="hero-now-tag">◀ NOW</span>
+        <span class="hero-now-tag">${tag}</span>
       </div>
       <div class="hero-title">${escape(t.title)}</div>
       ${notes}
@@ -127,9 +152,15 @@ function renderToday(tasks) {
 
   const now = nowMinutes();
   const currentTask = pickCurrent(timed, now);
+  const nextTask = currentTask ? null : pickNext(timed, now);
+  const featured = currentTask || nextTask;
+  const featuredKind = currentTask ? "now" : "next";
 
   const timelineHtml = timed.map(t => {
-    if (t === currentTask) return renderHero(t);
+    if (t === featured) {
+      const until = t === nextTask ? toMinutes(t.scheduled_time) - now : 0;
+      return renderHero(t, featuredKind, until);
+    }
     const isPast = toMinutes(t.scheduled_time) < now;
     return renderCompact(t, isPast);
   }).join("");
