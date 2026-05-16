@@ -12,6 +12,7 @@ APP_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(APP_DIR, "taskgenius.db")
 
 CATEGORIES = ("baby", "kitchen", "cleaning", "therapy", "other")
+DAYS = ("mon", "tue", "wed", "thu", "fri", "sat", "sun")
 TIME_RE = re.compile(r"^([01]?\d|2[0-3]):([0-5]\d)$")
 
 app = Flask(__name__)
@@ -78,6 +79,9 @@ def init_db():
             CREATE INDEX IF NOT EXISTS idx_tasks_category ON tasks(category);
             """
         )
+        cols = {r[1] for r in db.execute("PRAGMA table_info(tasks)").fetchall()}
+        if "days_of_week" not in cols:
+            db.execute("ALTER TABLE tasks ADD COLUMN days_of_week TEXT")
         db.commit()
 
 
@@ -86,6 +90,9 @@ def parse_form(form):
     notes = (form.get("notes") or "").strip()
     category = (form.get("category") or "").strip().lower()
     scheduled_time = (form.get("scheduled_time") or "").strip()
+    picked = [d for d in form.getlist("days") if d in DAYS]
+    # NULL = every day; only store a subset when the user actually narrowed it.
+    days_of_week = ",".join(picked) if picked and len(picked) < len(DAYS) else None
 
     errors = []
     if not title:
@@ -100,13 +107,14 @@ def parse_form(form):
         "notes": notes,
         "category": category,
         "scheduled_time": scheduled_time or None,
+        "days_of_week": days_of_week,
     }, errors
 
 
 def fetch_tasks():
     rows = get_db().execute(
         """
-        SELECT id, title, notes, category, scheduled_time, position
+        SELECT id, title, notes, category, scheduled_time, position, days_of_week
         FROM tasks
         ORDER BY
             CASE WHEN scheduled_time IS NULL THEN 1 ELSE 0 END,
@@ -137,6 +145,7 @@ def admin():
         "admin.html",
         tasks=tasks,
         categories=CATEGORIES,
+        days=DAYS,
         form={},
         errors=[],
         editing_id=edit_id,
@@ -152,14 +161,15 @@ def create_task():
             "admin.html",
             tasks=tasks,
             categories=CATEGORIES,
+            days=DAYS,
             form=data,
             errors=errors,
         ), 400
 
     db = get_db()
     db.execute(
-        "INSERT INTO tasks (title, notes, category, scheduled_time) VALUES (?, ?, ?, ?)",
-        (data["title"], data["notes"], data["category"], data["scheduled_time"]),
+        "INSERT INTO tasks (title, notes, category, scheduled_time, days_of_week) VALUES (?, ?, ?, ?, ?)",
+        (data["title"], data["notes"], data["category"], data["scheduled_time"], data["days_of_week"]),
     )
     db.commit()
     return redirect(url_for("admin"))
@@ -174,6 +184,7 @@ def edit_task(task_id):
             "admin.html",
             tasks=tasks,
             categories=CATEGORIES,
+            days=DAYS,
             form={**data, "id": task_id},
             errors=errors,
             editing_id=task_id,
@@ -183,10 +194,10 @@ def edit_task(task_id):
     cur = db.execute(
         """
         UPDATE tasks
-        SET title = ?, notes = ?, category = ?, scheduled_time = ?
+        SET title = ?, notes = ?, category = ?, scheduled_time = ?, days_of_week = ?
         WHERE id = ?
         """,
-        (data["title"], data["notes"], data["category"], data["scheduled_time"], task_id),
+        (data["title"], data["notes"], data["category"], data["scheduled_time"], data["days_of_week"], task_id),
     )
     if cur.rowcount == 0:
         abort(404)

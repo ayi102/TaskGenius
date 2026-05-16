@@ -1,9 +1,17 @@
 const REFRESH_MS = 30_000;
 const NOW_WINDOW_MIN = 60;
+const WEEK_STRIP_MAX_PER_DAY = 6;
 
-const boardEl = document.getElementById("board");
-const clockEl = document.getElementById("clock");
-const dateEl  = document.getElementById("date");
+const DAY_NAMES   = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"]; // Date.getDay() order
+const WEEK_ORDER  = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]; // Mon-first for display
+const DAY_LABEL   = { mon: "Mon", tue: "Tue", wed: "Wed", thu: "Thu", fri: "Fri", sat: "Sat", sun: "Sun" };
+const DAY_FULL    = { mon: "Monday", tue: "Tuesday", wed: "Wednesday", thu: "Thursday",
+                      fri: "Friday", sat: "Saturday", sun: "Sunday" };
+
+const boardEl  = document.getElementById("board");
+const stripEl  = document.getElementById("week-strip");
+const clockEl  = document.getElementById("clock");
+const dateEl   = document.getElementById("date");
 
 function toMinutes(hhmm) {
   if (!hhmm) return null;
@@ -14,6 +22,17 @@ function toMinutes(hhmm) {
 function nowMinutes() {
   const d = new Date();
   return d.getHours() * 60 + d.getMinutes();
+}
+
+function todayKey() {
+  return DAY_NAMES[new Date().getDay()];
+}
+
+function tasksForDay(allTasks, dayKey) {
+  return allTasks.filter(t => {
+    if (!t.days_of_week) return true;            // NULL = every day
+    return t.days_of_week.split(",").includes(dayKey);
+  });
 }
 
 function format12hr(hhmm) {
@@ -52,6 +71,8 @@ function pickCurrent(timed, now) {
   }
   return best;
 }
+
+/* ─── Today rendering ──────────────────────────────────── */
 
 function renderHero(t) {
   const notes = t.notes
@@ -95,12 +116,9 @@ function renderChip(t) {
   `;
 }
 
-function render(payload) {
-  const tasks = payload.tasks || [];
-  dateEl.textContent = payload.date || "";
-
+function renderToday(tasks) {
   if (tasks.length === 0) {
-    boardEl.innerHTML = `<p class="empty">No tasks scheduled.</p>`;
+    boardEl.innerHTML = `<p class="empty">No tasks for today.</p>`;
     return;
   }
 
@@ -119,13 +137,66 @@ function render(payload) {
   const anytimeHtml = untimed.length === 0 ? "" : `
     <section class="anytime">
       <div class="anytime-header">Anytime today</div>
-      <div class="anytime-list">
-        ${untimed.map(renderChip).join("")}
-      </div>
+      <div class="anytime-list">${untimed.map(renderChip).join("")}</div>
     </section>
   `;
 
   boardEl.innerHTML = `<div class="timeline">${timelineHtml}</div>${anytimeHtml}`;
+}
+
+/* ─── Week strip rendering ─────────────────────────────── */
+
+function renderDayEntry(t) {
+  const time = t.scheduled_time ? format12hr(t.scheduled_time) : "—";
+  const classes = ["day-entry"];
+  if (!t.scheduled_time) classes.push("untimed");
+  return `
+    <div class="${classes.join(" ")}" data-category="${escape(t.category)}">
+      <span class="time">${escape(time)}</span>
+      <span class="title">${escape(t.title)}</span>
+    </div>
+  `;
+}
+
+function renderDayColumn(dayKey, allTasks, isToday) {
+  const tasks = tasksForDay(allTasks, dayKey);
+  const shown = tasks.slice(0, WEEK_STRIP_MAX_PER_DAY);
+  const overflow = tasks.length - shown.length;
+
+  const body = tasks.length === 0
+    ? `<p class="day-empty">—</p>`
+    : shown.map(renderDayEntry).join("")
+      + (overflow > 0 ? `<div class="day-overflow">+${overflow} more</div>` : "");
+
+  const classes = ["day-col"];
+  if (isToday) classes.push("is-today");
+
+  return `
+    <section class="${classes.join(" ")}">
+      <header class="day-col-header">
+        <span class="day-col-name">${DAY_LABEL[dayKey]}</span>
+        <span class="day-col-count">${tasks.length}</span>
+      </header>
+      <div class="day-col-list">${body}</div>
+    </section>
+  `;
+}
+
+function renderWeek(allTasks) {
+  const today = todayKey();
+  stripEl.innerHTML = WEEK_ORDER
+    .map(d => renderDayColumn(d, allTasks, d === today))
+    .join("");
+}
+
+/* ─── Main render ──────────────────────────────────────── */
+
+function render(payload) {
+  const allTasks = payload.tasks || [];
+  dateEl.textContent = payload.date || "";
+
+  renderToday(tasksForDay(allTasks, todayKey()));
+  renderWeek(allTasks);
 }
 
 async function refresh() {

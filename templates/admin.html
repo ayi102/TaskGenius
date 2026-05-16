@@ -49,6 +49,20 @@
                   placeholder="e.g. 4oz formula, blue can">{{ form.notes or '' }}</textarea>
       </label>
 
+      {% set picked = (form.days_of_week.split(',') if form.days_of_week else days) %}
+      <fieldset class="days-field">
+        <legend>Days <small>(uncheck to limit)</small></legend>
+        <div class="day-grid">
+          {% for d in days %}
+            <label class="day-check">
+              <input type="checkbox" name="days" value="{{ d }}"
+                     {% if d in picked %}checked{% endif %}>
+              <span>{{ d|capitalize }}</span>
+            </label>
+          {% endfor %}
+        </div>
+      </fieldset>
+
       <button type="submit" class="primary">Add task</button>
     </form>
   </section>
@@ -74,6 +88,20 @@
                   <input type="time" name="scheduled_time" class="flex-1" value="{{ form.scheduled_time or t.scheduled_time or '' }}">
                 </div>
                 <textarea name="notes" rows="2" maxlength="400">{{ form.notes if form.notes is not none else t.notes }}</textarea>
+                {% set saved = t.days_of_week.split(',') if t.days_of_week else days %}
+                {% set picked = form.days_of_week.split(',') if form.days_of_week else saved %}
+                <fieldset class="days-field">
+                  <legend>Days</legend>
+                  <div class="day-grid">
+                    {% for d in days %}
+                      <label class="day-check">
+                        <input type="checkbox" name="days" value="{{ d }}"
+                               {% if d in picked %}checked{% endif %}>
+                        <span>{{ d|capitalize }}</span>
+                      </label>
+                    {% endfor %}
+                  </div>
+                </fieldset>
                 <div class="actions">
                   <button type="submit" class="primary">Save</button>
                   <a class="ghost" href="{{ url_for('admin') }}">Cancel</a>
@@ -87,6 +115,11 @@
                   <span class="title">{{ t.title }}</span>
                 </div>
                 {% if t.notes %}<p class="notes">{{ t.notes }}</p>{% endif %}
+                {% if t.days_of_week %}
+                  <p class="days-badge">{{ t.days_of_week.split(',')|map('capitalize')|join(' · ') }}</p>
+                {% else %}
+                  <p class="days-badge muted">Every day</p>
+                {% endif %}
               </div>
               <div class="actions">
                 <a class="ghost" href="{{ url_for('admin') }}?edit={{ t.id }}">Edit</a>

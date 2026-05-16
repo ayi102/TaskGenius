@@ -241,3 +241,78 @@ button.danger {
 .task-row .actions form { display: inline; }
 
 .task-form.inline { gap: 0.5rem; }
+
+/* ─── Day-of-week checkboxes ─── */
+
+.days-field {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.days-field legend {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 0.3rem;
+  padding: 0;
+}
+
+.days-field legend small {
+  font-weight: 400;
+  font-size: 0.85em;
+}
+
+.day-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.3rem;
+}
+
+.day-check {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0.45rem 0.2rem;
+  border: 1px solid var(--border);
+  border-radius: 0.45rem;
+  background: var(--surface);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  user-select: none;
+  transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+}
+
+.day-check input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.day-check:has(input:checked) {
+  background: #e6f1fb;
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+.day-check span { line-height: 1; }
+
+/* ─── Days badge in task list ─── */
+
+.days-badge {
+  margin: 0.25rem 0 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--primary);
+}
+
+.days-badge.muted {
+  color: var(--muted);
+  font-weight: 500;
+  font-style: italic;
+}
