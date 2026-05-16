@@ -43,14 +43,18 @@ is gitignored, so each machine keeps its own data.
 
 ## Raspberry Pi deployment
 
-These are the steps to install on a fresh Pi (Raspberry Pi OS, Bookworm or
-later) and have TaskGenius launch into kiosk mode on boot.
+Steps to install on a fresh Pi (Raspberry Pi OS, Bookworm or later) and have
+TaskGenius launch into kiosk mode on boot.
+
+> The commands below assume your Pi user is `ayi102` and the project lives at
+> `/home/ayi102/taskgenius`. If your username differs, swap it in everywhere
+> (including the systemd unit and any service file paths).
 
 ### 1. Get the code on the Pi
 
 ```bash
 sudo apt update
-sudo apt install -y git python3-venv chromium-browser unclutter
+sudo apt install -y git python3-venv chromium unclutter
 
 cd ~
 git clone https://github.com/ayi102/TaskGenius.git taskgenius
@@ -62,21 +66,27 @@ pip install -r requirements.txt
 
 ### 2. Run the server as a systemd service
 
-Create `/etc/systemd/system/taskgenius.service`:
+Install the unit file (uses a heredoc so it writes the literal content):
 
-```ini
+```bash
+sudo tee /etc/systemd/system/taskgenius.service > /dev/null << 'EOF'
 [Unit]
 Description=TaskGenius Flask server
-After=network.target
+After=network-online.target
+Wants=network-online.target
 
 [Service]
-User=pi
-WorkingDirectory=/home/pi/taskgenius
-ExecStart=/home/pi/taskgenius/venv/bin/python /home/pi/taskgenius/server.py
+Type=simple
+User=ayi102
+WorkingDirectory=/home/ayi102/taskgenius
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/home/ayi102/taskgenius/venv/bin/python /home/ayi102/taskgenius/server.py
 Restart=on-failure
+RestartSec=2
 
 [Install]
 WantedBy=multi-user.target
+EOF
 ```
 
 Enable + start:
@@ -92,20 +102,44 @@ The display is now reachable at `http://<pi-ip>:5000/`.
 
 ### 3. Kiosk mode (auto-launch Chromium full screen)
 
-Create `~/.config/autostart/taskgenius-kiosk.desktop`:
+Disable screen blanking so the display stays on:
 
-```ini
+```bash
+sudo raspi-config nonint do_blanking 1
+```
+
+Install the kiosk autostart entry:
+
+```bash
+mkdir -p ~/.config/autostart
+cat > ~/.config/autostart/taskgenius-kiosk.desktop << 'EOF'
 [Desktop Entry]
 Type=Application
 Name=TaskGenius Kiosk
-Exec=/bin/bash -c "unclutter -idle 0 & chromium-browser --noerrdialogs --disable-infobars --kiosk http://localhost:5000/"
+Comment=Full-screen Chromium pointing at the local TaskGenius display
+Exec=/bin/bash -c "until curl -sSf -o /dev/null http://localhost:5000/; do sleep 1; done; unclutter -idle 0 -root & chromium --noerrdialogs --disable-infobars --kiosk --autoplay-policy=no-user-gesture-required --disable-features=TranslateUI --disable-session-crashed-bubble --disable-pinch --overscroll-history-navigation=0 --check-for-update-interval=31536000 http://localhost:5000/"
 X-GNOME-Autostart-enabled=true
+EOF
 ```
 
-Reboot. The Pi will boot into the display view full-screen with no cursor.
+Notes on what the `Exec` line does:
 
-Tip: disable screen blanking in `raspi-config` → *Display Options* → *Screen
-Blanking* → *Disable*.
+- `until curl … http://localhost:5000/; do sleep 1; done` — wait until the
+  Flask server is responding before launching the browser, so a slow boot
+  doesn't land you on a "site can't be reached" page.
+- `unclutter -idle 0 -root` — hides the mouse cursor instantly.
+- The Chromium flags suppress all browser chrome (infobars, error dialogs,
+  translate prompt, crash-restore prompt), disable pinch-zoom and overscroll
+  swipe-navigation, and turn off update checks so they don't interrupt the
+  display.
+
+For this to take effect the Pi must boot to the desktop with autologin
+enabled (this is the default for Pi OS with desktop). Set it via
+`sudo raspi-config` → *System Options* → *Boot / Auto Login* → *Desktop
+Autologin* if needed.
+
+Reboot to verify: `sudo reboot`. The Pi will come back up full-screen on the
+display view.
 
 ---
 
@@ -141,7 +175,7 @@ Create `~/.cloudflared/config.yml`:
 
 ```yaml
 tunnel: <TUNNEL_UUID>
-credentials-file: /home/pi/.cloudflared/<TUNNEL_UUID>.json
+credentials-file: /home/ayi102/.cloudflared/<TUNNEL_UUID>.json
 
 ingress:
   - hostname: tasks.example.com
