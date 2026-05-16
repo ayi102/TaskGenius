@@ -59,9 +59,19 @@ body {
   align-items: baseline;
 }
 
+.header-left { justify-content: flex-start; }
+
 .header-meta {
   justify-content: flex-end;
   gap: 1.2rem;
+}
+
+.lan-url {
+  font-size: 0.78em;
+  color: var(--faint);
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
 }
 
 .brand {

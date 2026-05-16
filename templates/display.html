@@ -8,7 +8,11 @@
 </head>
 <body>
   <header class="display-header">
-    <div class="header-side"></div>
+    <div class="header-side header-left">
+      {% if lan_ip %}
+        <div class="lan-url">tasks @ {{ lan_ip }}:{{ port }}</div>
+      {% endif %}
+    </div>
     <div class="brand">
       <div class="brand-name">TaskGenius</div>
       <div class="brand-by">by ayi102</div>

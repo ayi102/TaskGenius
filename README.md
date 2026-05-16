@@ -80,6 +80,8 @@ Type=simple
 User=ayi102
 WorkingDirectory=/home/ayi102/taskgenius
 Environment=PYTHONUNBUFFERED=1
+ExecStartPre=-/usr/bin/git -C /home/ayi102/taskgenius pull --ff-only --quiet
+ExecStartPre=-/home/ayi102/taskgenius/venv/bin/pip install -q -r /home/ayi102/taskgenius/requirements.txt
 ExecStart=/home/ayi102/taskgenius/venv/bin/python /home/ayi102/taskgenius/server.py
 Restart=on-failure
 RestartSec=2
@@ -88,6 +90,20 @@ RestartSec=2
 WantedBy=multi-user.target
 EOF
 ```
+
+The two `ExecStartPre=` lines run before each service start (boot, manual
+restart, or auto-restart after a crash). They:
+
+1. Fast-forward pull the latest commit from `origin/main`, if any.
+2. Install any new Python dependencies that `requirements.txt` may have added.
+
+The leading `-` makes both steps non-fatal — if the Pi is offline or the
+pull conflicts with local edits, the service still starts using the code
+already on disk. Logs from both steps end up in `journalctl -u taskgenius`.
+
+Day-to-day workflow becomes: push from the laptop, then either reboot the
+Pi or run `sudo systemctl restart taskgenius` — the Pi grabs the new code
+automatically.
 
 Enable + start:
 
@@ -208,13 +224,17 @@ your email addresses can reach it. The app itself has no authentication.
 
 ## Updating the Pi after pushing new code
 
+Because the systemd unit's `ExecStartPre=` does the pull + pip install
+automatically, a single restart picks up the latest committed code:
+
 ```bash
-cd ~/taskgenius
-git pull
-sudo systemctl restart taskgenius
+ssh ayi102@<pi-ip> 'sudo systemctl restart taskgenius'
 ```
 
-The database file is preserved across updates (it's gitignored).
+Or just power-cycle the Pi — it'll pull and start during boot.
+
+The database file is preserved across updates (it's gitignored), so seeded
+tasks survive.
 
 ---
 

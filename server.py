@@ -1,6 +1,8 @@
 import os
 import re
+import socket
 import sqlite3
+import subprocess
 from contextlib import closing
 from datetime import datetime
 
@@ -13,6 +15,34 @@ CATEGORIES = ("baby", "kitchen", "cleaning", "therapy", "other")
 TIME_RE = re.compile(r"^([01]?\d|2[0-3]):([0-5]\d)$")
 
 app = Flask(__name__)
+
+
+def get_port():
+    return int(os.environ.get("PORT", "5000"))
+
+
+def get_lan_ip():
+    # Prefer wlan0 (the Pi's wifi) so the readout matches what the user expects.
+    try:
+        out = subprocess.check_output(
+            ["ip", "-4", "-o", "addr", "show", "wlan0"],
+            text=True, stderr=subprocess.DEVNULL, timeout=2,
+        )
+        for tok in out.split():
+            if "/" in tok and tok.split("/")[0].count(".") == 3:
+                return tok.split("/")[0]
+    except (subprocess.SubprocessError, FileNotFoundError, OSError):
+        pass
+
+    # Fallback: ask the kernel which local IP would route to the internet.
+    # Works on the laptop and on a Pi connected via ethernet.
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+            s.settimeout(0.5)
+            s.connect(("8.8.8.8", 80))
+            return s.getsockname()[0]
+    except OSError:
+        return None
 
 
 def get_db():
@@ -91,7 +121,12 @@ def fetch_tasks():
 
 @app.route("/")
 def display():
-    return render_template("display.html", categories=CATEGORIES)
+    return render_template(
+        "display.html",
+        categories=CATEGORIES,
+        lan_ip=get_lan_ip(),
+        port=get_port(),
+    )
 
 
 @app.route("/admin")
@@ -182,5 +217,4 @@ def api_tasks():
 
 if __name__ == "__main__":
     init_db()
-    port = int(os.environ.get("PORT", "5000"))
-    app.run(host="0.0.0.0", port=port, debug=True)
+    app.run(host="0.0.0.0", port=get_port(), debug=True)
