@@ -96,22 +96,23 @@ function formatUntil(mins) {
 /* ─── Today rendering ──────────────────────────────────── */
 
 function renderHero(t, kind, untilMins) {
-  const notes = t.notes
-    ? `<div class="hero-notes">${escape(t.notes)}</div>`
-    : "";
   const tag = kind === "now"
     ? "◀ NOW"
     : `▶ NEXT UP · ${formatUntil(untilMins)}`;
-  const timePrefix = kind === "now" ? "▶ " : "";
+  const notes = t.notes
+    ? `<div class="hero-notes">${escape(t.notes)}</div>`
+    : "";
   return `
     <div class="hero is-${kind}" data-category="${escape(t.category)}">
-      <div class="hero-top">
-        <span class="hero-time">${timePrefix}${escape(format12hr(t.scheduled_time))}</span>
-        <span class="hero-category">${escape(t.category)}</span>
-        <span class="hero-now-tag">${tag}</span>
+      <div class="hero-meta">
+        <div class="hero-time">${escape(format12hr(t.scheduled_time))}</div>
+        <div class="hero-category">${escape(t.category)}</div>
       </div>
-      <div class="hero-title">${escape(t.title)}</div>
-      ${notes}
+      <div class="hero-main">
+        <div class="hero-title">${escape(t.title)}</div>
+        ${notes}
+      </div>
+      <div class="hero-tag">${tag}</div>
     </div>
   `;
 }
