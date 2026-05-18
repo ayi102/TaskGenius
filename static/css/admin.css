@@ -1,22 +1,34 @@
 :root {
-  --bg: #f5f6f8;
-  --surface: #ffffff;
-  --text: #1a1d24;
-  --muted: #6b7280;
-  --border: #e3e6ec;
-  --primary: #2c6cff;
-  --primary-text: #ffffff;
-  --danger: #d23b3b;
-  --danger-bg: #fff1f1;
-  --idris: #1f7bbf;
-  --elina: #c43d6e;
-  --jenin: #178a6b;
-  --kitchen: #c46a18;
-  --cleaning: #2c8a4a;
-  --therapy: #137b7b;
-  --other: #7a4dc7;
-  --error-bg: #fff1f1;
-  --error-text: #b1141a;
+  --bg: #0b0f17;
+  --surface: #161b25;
+  --surface-hover: #1c2230;
+  --text: #f4f6fb;
+  --muted: #9aa3b6;
+  --faint: #6b7388;
+  --border: rgba(255, 255, 255, 0.09);
+  --primary: #5b8dff;
+  --primary-text: #0b0f17;
+  --primary-soft: rgba(91, 141, 255, 0.14);
+  --danger: #ff7a7a;
+  --danger-bg: rgba(255, 122, 122, 0.12);
+  --idris: #6cb8ff;
+  --elina: #ff8fb1;
+  --jenin: #6ee7d2;
+  --kitchen: #ffae6e;
+  --cleaning: #86e89a;
+  --therapy: #5cdcdc;
+  --other: #cdb0ff;
+  --error-bg: rgba(255, 122, 122, 0.12);
+  --error-text: #ff9c9c;
+
+  /* Soft tinted backgrounds for category chips on dark */
+  --tint-idris:    rgba(108, 184, 255, 0.14);
+  --tint-elina:    rgba(255, 143, 177, 0.14);
+  --tint-jenin:    rgba(110, 231, 210, 0.14);
+  --tint-kitchen:  rgba(255, 174, 110, 0.14);
+  --tint-cleaning: rgba(134, 232, 154, 0.14);
+  --tint-therapy:  rgba(92, 220, 220, 0.14);
+  --tint-other:    rgba(205, 176, 255, 0.14);
 }
 
 * { box-sizing: border-box; }
@@ -122,7 +134,7 @@ body.week-page {
 .errors {
   background: var(--error-bg);
   color: var(--error-text);
-  border: 1px solid #f5b6b6;
+  border: 1px solid rgba(255, 122, 122, 0.3);
   border-radius: 0.5rem;
   padding: 0.6rem 0.9rem;
   margin-bottom: 1rem;
@@ -229,7 +241,7 @@ button.primary {
 button.danger {
   background: var(--danger-bg);
   color: var(--danger);
-  border-color: #f5c2c2;
+  border-color: rgba(255, 122, 122, 0.35);
 }
 
 .ghost {
@@ -280,18 +292,18 @@ button.danger {
   font-weight: 700;
   padding: 0.1rem 0.45rem;
   border-radius: 0.3rem;
-  background: #eef0f5;
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .task-line .title { font-weight: 500; }
 
-.task-row[data-category="idris"]    .task-line .category { color: var(--idris);    background: #e6f1fb; }
-.task-row[data-category="elina"]    .task-line .category { color: var(--elina);    background: #fbe6ee; }
-.task-row[data-category="jenin"]    .task-line .category { color: var(--jenin);    background: #def4ee; }
-.task-row[data-category="kitchen"]  .task-line .category { color: var(--kitchen);  background: #fbeede; }
-.task-row[data-category="cleaning"] .task-line .category { color: var(--cleaning); background: #e2f1e7; }
-.task-row[data-category="therapy"]  .task-line .category { color: var(--therapy);  background: #ddf1f1; }
-.task-row[data-category="other"]    .task-line .category { color: var(--other);    background: #ede4fa; }
+.task-row[data-category="idris"]    .task-line .category { color: var(--idris);    background: var(--tint-idris); }
+.task-row[data-category="elina"]    .task-line .category { color: var(--elina);    background: var(--tint-elina); }
+.task-row[data-category="jenin"]    .task-line .category { color: var(--jenin);    background: var(--tint-jenin); }
+.task-row[data-category="kitchen"]  .task-line .category { color: var(--kitchen);  background: var(--tint-kitchen); }
+.task-row[data-category="cleaning"] .task-line .category { color: var(--cleaning); background: var(--tint-cleaning); }
+.task-row[data-category="therapy"]  .task-line .category { color: var(--therapy);  background: var(--tint-therapy); }
+.task-row[data-category="other"]    .task-line .category { color: var(--other);    background: var(--tint-other); }
 
 .task-row .notes {
   color: var(--muted);
@@ -360,13 +372,13 @@ button.danger {
   pointer-events: none;
 }
 
-.cat-check[data-category="idris"]:has(input:checked)    { background: #e6f1fb; color: var(--idris);    border-color: var(--idris); }
-.cat-check[data-category="elina"]:has(input:checked)    { background: #fbe6ee; color: var(--elina);    border-color: var(--elina); }
-.cat-check[data-category="jenin"]:has(input:checked)    { background: #def4ee; color: var(--jenin);    border-color: var(--jenin); }
-.cat-check[data-category="kitchen"]:has(input:checked)  { background: #fbeede; color: var(--kitchen);  border-color: var(--kitchen); }
-.cat-check[data-category="cleaning"]:has(input:checked) { background: #e2f1e7; color: var(--cleaning); border-color: var(--cleaning); }
-.cat-check[data-category="therapy"]:has(input:checked)  { background: #ddf1f1; color: var(--therapy);  border-color: var(--therapy); }
-.cat-check[data-category="other"]:has(input:checked)    { background: #ede4fa; color: var(--other);    border-color: var(--other); }
+.cat-check[data-category="idris"]:has(input:checked)    { background: var(--tint-idris); color: var(--idris);    border-color: var(--idris); }
+.cat-check[data-category="elina"]:has(input:checked)    { background: var(--tint-elina); color: var(--elina);    border-color: var(--elina); }
+.cat-check[data-category="jenin"]:has(input:checked)    { background: var(--tint-jenin); color: var(--jenin);    border-color: var(--jenin); }
+.cat-check[data-category="kitchen"]:has(input:checked)  { background: var(--tint-kitchen); color: var(--kitchen);  border-color: var(--kitchen); }
+.cat-check[data-category="cleaning"]:has(input:checked) { background: var(--tint-cleaning); color: var(--cleaning); border-color: var(--cleaning); }
+.cat-check[data-category="therapy"]:has(input:checked)  { background: var(--tint-therapy); color: var(--therapy);  border-color: var(--therapy); }
+.cat-check[data-category="other"]:has(input:checked)    { background: var(--tint-other); color: var(--other);    border-color: var(--other); }
 
 /* Multi-category badge in task list */
 .task-line .category.multi {
@@ -386,13 +398,13 @@ button.danger {
   font-weight: inherit;
 }
 
-.task-line .category.multi > span[data-category="idris"]    { color: var(--idris);    background: #e6f1fb; }
-.task-line .category.multi > span[data-category="elina"]    { color: var(--elina);    background: #fbe6ee; }
-.task-line .category.multi > span[data-category="jenin"]    { color: var(--jenin);    background: #def4ee; }
-.task-line .category.multi > span[data-category="kitchen"]  { color: var(--kitchen);  background: #fbeede; }
-.task-line .category.multi > span[data-category="cleaning"] { color: var(--cleaning); background: #e2f1e7; }
-.task-line .category.multi > span[data-category="therapy"]  { color: var(--therapy);  background: #ddf1f1; }
-.task-line .category.multi > span[data-category="other"]    { color: var(--other);    background: #ede4fa; }
+.task-line .category.multi > span[data-category="idris"]    { color: var(--idris);    background: var(--tint-idris); }
+.task-line .category.multi > span[data-category="elina"]    { color: var(--elina);    background: var(--tint-elina); }
+.task-line .category.multi > span[data-category="jenin"]    { color: var(--jenin);    background: var(--tint-jenin); }
+.task-line .category.multi > span[data-category="kitchen"]  { color: var(--kitchen);  background: var(--tint-kitchen); }
+.task-line .category.multi > span[data-category="cleaning"] { color: var(--cleaning); background: var(--tint-cleaning); }
+.task-line .category.multi > span[data-category="therapy"]  { color: var(--therapy);  background: var(--tint-therapy); }
+.task-line .category.multi > span[data-category="other"]    { color: var(--other);    background: var(--tint-other); }
 
 /* ─── Day-of-week checkboxes ─── */
 
@@ -446,7 +458,7 @@ button.danger {
 }
 
 .day-check:has(input:checked) {
-  background: #e6f1fb;
+  background: var(--tint-idris);
   color: var(--primary);
   border-color: var(--primary);
 }
@@ -507,7 +519,7 @@ button.danger {
 
 .week-col.is-today {
   border-top-color: var(--primary);
-  background: #f4f8ff;
+  background: var(--primary-soft);
 }
 
 .week-col-head {
@@ -573,7 +585,7 @@ button.danger {
 }
 
 .week-item-link:hover {
-  background: rgba(44, 108, 255, 0.04);
+  background: var(--primary-soft);
 }
 
 .week-item-top {
@@ -607,13 +619,13 @@ button.danger {
   white-space: nowrap;
 }
 
-.week-item .cats > span[data-category="idris"]    { color: var(--idris);    background: #e6f1fb; }
-.week-item .cats > span[data-category="elina"]    { color: var(--elina);    background: #fbe6ee; }
-.week-item .cats > span[data-category="jenin"]    { color: var(--jenin);    background: #def4ee; }
-.week-item .cats > span[data-category="kitchen"]  { color: var(--kitchen);  background: #fbeede; }
-.week-item .cats > span[data-category="cleaning"] { color: var(--cleaning); background: #e2f1e7; }
-.week-item .cats > span[data-category="therapy"]  { color: var(--therapy);  background: #ddf1f1; }
-.week-item .cats > span[data-category="other"]    { color: var(--other);    background: #ede4fa; }
+.week-item .cats > span[data-category="idris"]    { color: var(--idris);    background: var(--tint-idris); }
+.week-item .cats > span[data-category="elina"]    { color: var(--elina);    background: var(--tint-elina); }
+.week-item .cats > span[data-category="jenin"]    { color: var(--jenin);    background: var(--tint-jenin); }
+.week-item .cats > span[data-category="kitchen"]  { color: var(--kitchen);  background: var(--tint-kitchen); }
+.week-item .cats > span[data-category="cleaning"] { color: var(--cleaning); background: var(--tint-cleaning); }
+.week-item .cats > span[data-category="therapy"]  { color: var(--therapy);  background: var(--tint-therapy); }
+.week-item .cats > span[data-category="other"]    { color: var(--other);    background: var(--tint-other); }
 
 .week-item-title {
   font-size: 0.9rem;
