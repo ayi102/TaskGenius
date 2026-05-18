@@ -9,7 +9,10 @@
 <body>
   <header class="admin-header">
     <h1>TaskGenius</h1>
-    <a class="view-display" href="{{ url_for('display') }}" target="_blank" rel="noopener">Display ↗</a>
+    <nav class="header-nav">
+      <a href="{{ url_for('week') }}">Week</a>
+      <a href="{{ url_for('display') }}" target="_blank" rel="noopener" class="view-display">Display ↗</a>
+    </nav>
   </header>
 
   <nav class="day-tabs" aria-label="Filter tasks by day">

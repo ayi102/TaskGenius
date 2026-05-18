@@ -37,6 +37,10 @@ body {
   margin: 0 auto;
 }
 
+body.week-page {
+  max-width: 1600px;
+}
+
 .admin-header {
   display: flex;
   align-items: center;
@@ -53,6 +57,19 @@ body {
   color: var(--primary);
   text-decoration: none;
   font-weight: 500;
+}
+
+.header-nav {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.header-nav a {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
 }
 
 /* ─── Day filter tabs ─── */
@@ -450,4 +467,186 @@ button.danger {
   color: var(--muted);
   font-weight: 500;
   font-style: italic;
+}
+
+/* ─── /week view ─── */
+
+.week-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 0.7rem;
+}
+
+.week-meta h2 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.week-meta .count {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.week-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.week-col {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.6rem;
+  padding: 0.6rem;
+  border-top: 3px solid var(--border);
+}
+
+.week-col.is-today {
+  border-top-color: var(--primary);
+  background: #f4f8ff;
+}
+
+.week-col-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.week-col-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.week-col.is-today .week-col-name {
+  color: var(--primary);
+}
+
+.week-col-name:hover {
+  text-decoration: underline;
+}
+
+.week-col-count {
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.week-empty {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-style: italic;
+  margin: 0.4rem 0;
+}
+
+.week-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.week-item {
+  border-radius: 0.4rem;
+  border-left: 3px solid var(--border);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.week-item-link {
+  display: block;
+  padding: 0.5rem 0.55rem;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.week-item-link:hover {
+  background: rgba(44, 108, 255, 0.04);
+}
+
+.week-item-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem;
+  margin-bottom: 0.2rem;
+}
+
+.week-item .time {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.week-item .cats {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.2rem;
+}
+
+.week-item .cats > span {
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 0.08rem 0.35rem;
+  border-radius: 0.25rem;
+  white-space: nowrap;
+}
+
+.week-item .cats > span[data-category="idris"]    { color: var(--idris);    background: #e6f1fb; }
+.week-item .cats > span[data-category="elina"]    { color: var(--elina);    background: #fbe6ee; }
+.week-item .cats > span[data-category="jenin"]    { color: var(--jenin);    background: #def4ee; }
+.week-item .cats > span[data-category="kitchen"]  { color: var(--kitchen);  background: #fbeede; }
+.week-item .cats > span[data-category="cleaning"] { color: var(--cleaning); background: #e2f1e7; }
+.week-item .cats > span[data-category="therapy"]  { color: var(--therapy);  background: #ddf1f1; }
+.week-item .cats > span[data-category="other"]    { color: var(--other);    background: #ede4fa; }
+
+.week-item-title {
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.week-item-tag {
+  font-size: 0.7rem;
+  color: var(--muted);
+  font-style: italic;
+  margin-top: 0.2rem;
+}
+
+.week-item[data-category="idris"]    { border-left-color: var(--idris); }
+.week-item[data-category="elina"]    { border-left-color: var(--elina); }
+.week-item[data-category="jenin"]    { border-left-color: var(--jenin); }
+.week-item[data-category="kitchen"]  { border-left-color: var(--kitchen); }
+.week-item[data-category="cleaning"] { border-left-color: var(--cleaning); }
+.week-item[data-category="therapy"]  { border-left-color: var(--therapy); }
+.week-item[data-category="other"]    { border-left-color: var(--other); }
+
+/* Tablet: 4 columns */
+@media (max-width: 1100px) {
+  .week-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+/* Phone: 2 columns */
+@media (max-width: 700px) {
+  .week-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* Tiny phone: stack */
+@media (max-width: 420px) {
+  .week-grid { grid-template-columns: 1fr; }
 }

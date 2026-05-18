@@ -180,6 +180,22 @@ def admin():
     return render_template("admin.html", **_admin_context(editing_id=edit_id))
 
 
+@app.route("/week")
+def week():
+    all_tasks = fetch_tasks()
+    tasks_by_day = {d: tasks_on_day(all_tasks, d) for d in DAYS}
+    # Python weekday(): Mon=0 ... Sun=6, matches our DAYS tuple order.
+    today_key = DAYS[datetime.now().weekday()]
+    return render_template(
+        "week.html",
+        days=DAYS,
+        tasks_by_day=tasks_by_day,
+        day_counts={d: len(tasks_by_day[d]) for d in DAYS},
+        total_tasks=len(all_tasks),
+        today_key=today_key,
+    )
+
+
 def _admin_redirect():
     day = request.args.get("day")
     return redirect(url_for("admin", day=day) if day in DAYS else url_for("admin"))

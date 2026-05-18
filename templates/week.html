@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TaskGenius · Week</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body class="week-page">
+  <header class="admin-header">
+    <h1>TaskGenius</h1>
+    <nav class="header-nav">
+      <a href="{{ url_for('admin') }}">Admin</a>
+      <a href="{{ url_for('display') }}" target="_blank" rel="noopener" class="view-display">Display ↗</a>
+    </nav>
+  </header>
+
+  <section class="week-meta">
+    <h2>This week</h2>
+    <span class="count">{{ total_tasks }} total tasks</span>
+  </section>
+
+  <div class="week-grid">
+    {% for d in days %}
+      <section class="week-col {% if d == today_key %}is-today{% endif %}" data-day="{{ d }}">
+        <header class="week-col-head">
+          <a class="week-col-name" href="{{ url_for('admin', day=d) }}">{{ d|capitalize }}</a>
+          <span class="week-col-count">{{ day_counts[d] }}</span>
+        </header>
+
+        {% if tasks_by_day[d]|length == 0 %}
+          <p class="week-empty">Nothing scheduled.</p>
+        {% else %}
+          <ul class="week-list">
+            {% for t in tasks_by_day[d] %}
+              {% set first_cat = (t.category.split(',')[0] if t.category else '') %}
+              <li class="week-item" data-category="{{ first_cat }}">
+                <a href="{{ url_for('admin', edit=t.id, day=d) }}" class="week-item-link">
+                  <div class="week-item-top">
+                    <span class="time">{{ t.scheduled_time|fmt12 }}</span>
+                    <span class="cats">
+                      {% for c in t.category.split(',') %}<span data-category="{{ c }}">{{ c|capitalize }}</span>{% endfor %}
+                    </span>
+                  </div>
+                  <div class="week-item-title">{{ t.title }}</div>
+                  {% if not t.days_of_week %}
+                    <div class="week-item-tag">every day</div>
+                  {% endif %}
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </section>
+    {% endfor %}
+  </div>
+</body>
+</html>
