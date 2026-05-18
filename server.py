@@ -145,6 +145,35 @@ def tasks_on_day(tasks, day):
     return [t for t in tasks if not t["days_of_week"] or day in t["days_of_week"].split(",")]
 
 
+def pick_featured(today_tasks, now_dt=None):
+    """Return (task_id, kind) where kind is 'now' if a task is within ±60 min of
+    the current time, else 'next' if there's an upcoming task today, else (None, None)."""
+    now_dt = now_dt or datetime.now()
+    now_min = now_dt.hour * 60 + now_dt.minute
+
+    best_now, best_diff = None, 61
+    next_up, next_min = None, 24 * 60 + 1
+    for t in today_tasks:
+        if not t["scheduled_time"]:
+            continue
+        try:
+            h, m = (int(x) for x in t["scheduled_time"].split(":"))
+        except ValueError:
+            continue
+        tm = h * 60 + m
+        diff = abs(tm - now_min)
+        if diff < best_diff:
+            best_now, best_diff = t, diff
+        if now_min < tm < next_min:
+            next_up, next_min = t, tm
+
+    if best_now:
+        return best_now["id"], "now"
+    if next_up:
+        return next_up["id"], "next"
+    return None, None
+
+
 @app.route("/")
 def display():
     return render_template(
@@ -184,8 +213,8 @@ def admin():
 def week():
     all_tasks = fetch_tasks()
     tasks_by_day = {d: tasks_on_day(all_tasks, d) for d in DAYS}
-    # Python weekday(): Mon=0 ... Sun=6, matches our DAYS tuple order.
     today_key = DAYS[datetime.now().weekday()]
+    featured_id, featured_kind = pick_featured(tasks_by_day[today_key])
     return render_template(
         "week.html",
         days=DAYS,
@@ -193,6 +222,8 @@ def week():
         day_counts={d: len(tasks_by_day[d]) for d in DAYS},
         total_tasks=len(all_tasks),
         today_key=today_key,
+        featured_id=featured_id,
+        featured_kind=featured_kind,
     )
 
 

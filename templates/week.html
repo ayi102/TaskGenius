@@ -34,13 +34,17 @@
           <ul class="week-list">
             {% for t in tasks_by_day[d] %}
               {% set first_cat = (t.category.split(',')[0] if t.category else '') %}
-              <li class="week-item" data-category="{{ first_cat }}">
+              {% set is_featured = (d == today_key and t.id == featured_id) %}
+              <li class="week-item {% if is_featured %}is-{{ featured_kind }}{% endif %}" data-category="{{ first_cat }}">
                 <a href="{{ url_for('admin', edit=t.id, day=d) }}" class="week-item-link">
                   <div class="week-item-top">
                     <span class="time">{{ t.scheduled_time|fmt12 }}</span>
                     <span class="cats">
                       {% for c in t.category.split(',') %}<span data-category="{{ c }}">{{ c|capitalize }}</span>{% endfor %}
                     </span>
+                    {% if is_featured %}
+                      <span class="now-tag">{% if featured_kind == 'now' %}NOW{% else %}NEXT{% endif %}</span>
+                    {% endif %}
                   </div>
                   <div class="week-item-title">{{ t.title }}</div>
                   {% if not t.days_of_week %}

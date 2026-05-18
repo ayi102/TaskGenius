@@ -11,6 +11,8 @@
   --primary-soft: rgba(91, 141, 255, 0.14);
   --danger: #ff7a7a;
   --danger-bg: rgba(255, 122, 122, 0.12);
+  --now: #ffcf3f;
+  --tint-now: rgba(255, 207, 63, 0.10);
   --idris: #6cb8ff;
   --elina: #ff8fb1;
   --jenin: #6ee7d2;
@@ -647,6 +649,39 @@ button.danger {
 .week-item[data-category="cleaning"] { border-left-color: var(--cleaning); }
 .week-item[data-category="therapy"]  { border-left-color: var(--therapy); }
 .week-item[data-category="other"]    { border-left-color: var(--other); }
+
+/* NOW / NEXT featured task — gold accent, overrides category color */
+.week-item.is-now,
+.week-item.is-next {
+  background:
+    linear-gradient(180deg, rgba(255, 207, 63, 0.10), rgba(255, 207, 63, 0.02)),
+    var(--surface);
+  border: 1px solid rgba(255, 207, 63, 0.55);
+  border-left: 4px solid var(--now);
+  box-shadow: 0 6px 24px rgba(255, 207, 63, 0.10);
+}
+
+.week-item.is-now { animation: weekItemPulse 3.6s ease-in-out infinite; }
+
+.week-item.is-now .week-item-link,
+.week-item.is-next .week-item-link { color: var(--text); }
+
+.week-item.is-now .time,
+.week-item.is-next .time { color: var(--now); }
+
+.now-tag {
+  margin-left: auto;
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  font-weight: 700;
+  color: var(--now);
+  text-transform: uppercase;
+}
+
+@keyframes weekItemPulse {
+  0%, 100% { box-shadow: 0 6px 24px rgba(255, 207, 63, 0.08), 0 0 0 0 rgba(255, 207, 63, 0.0); }
+  50%      { box-shadow: 0 10px 32px rgba(255, 207, 63, 0.18), 0 0 0 3px rgba(255, 207, 63, 0.10); }
+}
 
 /* Tablet: 4 columns */
 @media (max-width: 1100px) {
