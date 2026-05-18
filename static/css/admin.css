@@ -8,7 +8,9 @@
   --primary-text: #ffffff;
   --danger: #d23b3b;
   --danger-bg: #fff1f1;
-  --baby: #1f7bbf;
+  --idris: #1f7bbf;
+  --elina: #c43d6e;
+  --jenin: #178a6b;
   --kitchen: #c46a18;
   --cleaning: #2c8a4a;
   --therapy: #137b7b;
@@ -219,7 +221,9 @@ button.danger {
 
 .task-line .title { font-weight: 500; }
 
-.task-row[data-category="baby"]     .task-line .category { color: var(--baby);     background: #e6f1fb; }
+.task-row[data-category="idris"]    .task-line .category { color: var(--idris);    background: #e6f1fb; }
+.task-row[data-category="elina"]    .task-line .category { color: var(--elina);    background: #fbe6ee; }
+.task-row[data-category="jenin"]    .task-line .category { color: var(--jenin);    background: #def4ee; }
 .task-row[data-category="kitchen"]  .task-line .category { color: var(--kitchen);  background: #fbeede; }
 .task-row[data-category="cleaning"] .task-line .category { color: var(--cleaning); background: #e2f1e7; }
 .task-row[data-category="therapy"]  .task-line .category { color: var(--therapy);  background: #ddf1f1; }

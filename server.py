@@ -11,11 +11,23 @@ from flask import Flask, abort, g, jsonify, redirect, render_template, request, 
 APP_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(APP_DIR, "taskgenius.db")
 
-CATEGORIES = ("baby", "kitchen", "cleaning", "therapy", "other")
+CATEGORIES = ("idris", "elina", "jenin", "kitchen", "cleaning", "therapy", "other")
 DAYS = ("mon", "tue", "wed", "thu", "fri", "sat", "sun")
 TIME_RE = re.compile(r"^([01]?\d|2[0-3]):([0-5]\d)$")
 
 app = Flask(__name__)
+
+
+@app.template_filter("fmt12")
+def fmt12(hhmm):
+    if not hhmm:
+        return "—"
+    try:
+        h, m = (int(x) for x in hhmm.split(":"))
+    except (ValueError, AttributeError):
+        return hhmm
+    ampm = "pm" if h >= 12 else "am"
+    return f"{h % 12 or 12}:{m:02d}{ampm}"
 
 
 def get_port():

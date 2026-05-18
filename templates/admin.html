@@ -110,7 +110,7 @@
             {% else %}
               <div class="task-summary">
                 <div class="task-line">
-                  <span class="time">{{ t.scheduled_time or '—' }}</span>
+                  <span class="time">{{ t.scheduled_time|fmt12 }}</span>
                   <span class="category">{{ t.category }}</span>
                   <span class="title">{{ t.title }}</span>
                 </div>

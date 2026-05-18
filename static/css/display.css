@@ -11,7 +11,9 @@
   --now:       #ffcf3f;
   --now-glow:  rgba(255, 207, 63, 0.16);
 
-  --baby:      #6cb8ff;
+  --idris:     #6cb8ff;
+  --elina:     #ff8fb1;
+  --jenin:     #6ee7d2;
   --kitchen:   #ffae6e;
   --cleaning:  #86e89a;
   --therapy:   #5cdcdc;
@@ -196,13 +198,17 @@ body {
   opacity: 0.6;
 }
 
-.task[data-category="baby"]     { border-left-color: var(--baby); }
+.task[data-category="idris"]    { border-left-color: var(--idris); }
+.task[data-category="elina"]    { border-left-color: var(--elina); }
+.task[data-category="jenin"]    { border-left-color: var(--jenin); }
 .task[data-category="kitchen"]  { border-left-color: var(--kitchen); }
 .task[data-category="cleaning"] { border-left-color: var(--cleaning); }
 .task[data-category="therapy"]  { border-left-color: var(--therapy); }
 .task[data-category="other"]    { border-left-color: var(--other); }
 
-.task[data-category="baby"]     .category { color: var(--baby); }
+.task[data-category="idris"]    .category { color: var(--idris); }
+.task[data-category="elina"]    .category { color: var(--elina); }
+.task[data-category="jenin"]    .category { color: var(--jenin); }
 .task[data-category="kitchen"]  .category { color: var(--kitchen); }
 .task[data-category="cleaning"] .category { color: var(--cleaning); }
 .task[data-category="therapy"]  .category { color: var(--therapy); }
@@ -292,7 +298,9 @@ body {
   align-self: center;
 }
 
-.hero[data-category="baby"]     .hero-category { color: var(--baby); }
+.hero[data-category="idris"]    .hero-category { color: var(--idris); }
+.hero[data-category="elina"]    .hero-category { color: var(--elina); }
+.hero[data-category="jenin"]    .hero-category { color: var(--jenin); }
 .hero[data-category="kitchen"]  .hero-category { color: var(--kitchen); }
 .hero[data-category="cleaning"] .hero-category { color: var(--cleaning); }
 .hero[data-category="therapy"]  .hero-category { color: var(--therapy); }
@@ -387,7 +395,9 @@ body {
   font-weight: 500;
 }
 
-.day-entry[data-category="baby"]     { border-left-color: var(--baby); }
+.day-entry[data-category="idris"]    { border-left-color: var(--idris); }
+.day-entry[data-category="elina"]    { border-left-color: var(--elina); }
+.day-entry[data-category="jenin"]    { border-left-color: var(--jenin); }
 .day-entry[data-category="kitchen"]  { border-left-color: var(--kitchen); }
 .day-entry[data-category="cleaning"] { border-left-color: var(--cleaning); }
 .day-entry[data-category="therapy"]  { border-left-color: var(--therapy); }
@@ -454,13 +464,17 @@ body {
 
 .chip .title { font-weight: 500; }
 
-.chip[data-category="baby"]     { border-left-color: var(--baby); }
+.chip[data-category="idris"]    { border-left-color: var(--idris); }
+.chip[data-category="elina"]    { border-left-color: var(--elina); }
+.chip[data-category="jenin"]    { border-left-color: var(--jenin); }
 .chip[data-category="kitchen"]  { border-left-color: var(--kitchen); }
 .chip[data-category="cleaning"] { border-left-color: var(--cleaning); }
 .chip[data-category="therapy"]  { border-left-color: var(--therapy); }
 .chip[data-category="other"]    { border-left-color: var(--other); }
 
-.chip[data-category="baby"]     .category { color: var(--baby); }
+.chip[data-category="idris"]    .category { color: var(--idris); }
+.chip[data-category="elina"]    .category { color: var(--elina); }
+.chip[data-category="jenin"]    .category { color: var(--jenin); }
 .chip[data-category="kitchen"]  .category { color: var(--kitchen); }
 .chip[data-category="cleaning"] .category { color: var(--cleaning); }
 .chip[data-category="therapy"]  .category { color: var(--therapy); }
