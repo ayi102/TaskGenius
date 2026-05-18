@@ -1,17 +1,11 @@
 const REFRESH_MS = 30_000;
 const NOW_WINDOW_MIN = 60;
-const WEEK_STRIP_MAX_PER_DAY = 6;
 
-const DAY_NAMES   = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"]; // Date.getDay() order
-const WEEK_ORDER  = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]; // Mon-first for display
-const DAY_LABEL   = { mon: "Mon", tue: "Tue", wed: "Wed", thu: "Thu", fri: "Fri", sat: "Sat", sun: "Sun" };
-const DAY_FULL    = { mon: "Monday", tue: "Tuesday", wed: "Wednesday", thu: "Thursday",
-                      fri: "Friday", sat: "Saturday", sun: "Sunday" };
+const DAY_NAMES = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"]; // Date.getDay() order
 
-const boardEl  = document.getElementById("board");
-const stripEl  = document.getElementById("week-strip");
-const clockEl  = document.getElementById("clock");
-const dateEl   = document.getElementById("date");
+const boardEl = document.getElementById("board");
+const clockEl = document.getElementById("clock");
+const dateEl  = document.getElementById("date");
 
 function toMinutes(hhmm) {
   if (!hhmm) return null;
@@ -192,57 +186,12 @@ function renderToday(tasks) {
 
 /* ─── Week strip rendering ─────────────────────────────── */
 
-function renderDayEntry(t) {
-  const time = t.scheduled_time ? format12hr(t.scheduled_time) : "—";
-  const classes = ["day-entry"];
-  if (!t.scheduled_time) classes.push("untimed");
-  return `
-    <div class="${classes.join(" ")}" data-category="${escape(firstCat(t.category))}">
-      <span class="time">${escape(time)}</span>
-      <span class="title">${escape(t.title)}</span>
-    </div>
-  `;
-}
-
-function renderDayColumn(dayKey, allTasks, isToday) {
-  const tasks = tasksForDay(allTasks, dayKey);
-  const shown = tasks.slice(0, WEEK_STRIP_MAX_PER_DAY);
-  const overflow = tasks.length - shown.length;
-
-  const body = tasks.length === 0
-    ? `<p class="day-empty">—</p>`
-    : shown.map(renderDayEntry).join("")
-      + (overflow > 0 ? `<div class="day-overflow">+${overflow} more</div>` : "");
-
-  const classes = ["day-col"];
-  if (isToday) classes.push("is-today");
-
-  return `
-    <section class="${classes.join(" ")}">
-      <header class="day-col-header">
-        <span class="day-col-name">${DAY_LABEL[dayKey]}</span>
-        <span class="day-col-count">${tasks.length}</span>
-      </header>
-      <div class="day-col-list">${body}</div>
-    </section>
-  `;
-}
-
-function renderWeek(allTasks) {
-  const today = todayKey();
-  stripEl.innerHTML = WEEK_ORDER
-    .map(d => renderDayColumn(d, allTasks, d === today))
-    .join("");
-}
-
 /* ─── Main render ──────────────────────────────────────── */
 
 function render(payload) {
   const allTasks = payload.tasks || [];
   dateEl.textContent = payload.date || "";
-
   renderToday(tasksForDay(allTasks, todayKey()));
-  renderWeek(allTasks);
 }
 
 async function refresh() {
