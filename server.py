@@ -141,6 +141,10 @@ def fetch_tasks():
     return [dict(r) for r in rows]
 
 
+def tasks_on_day(tasks, day):
+    return [t for t in tasks if not t["days_of_week"] or day in t["days_of_week"].split(",")]
+
+
 @app.route("/")
 def display():
     return render_template(
@@ -151,34 +155,41 @@ def display():
     )
 
 
+def _admin_context(form=None, errors=None, editing_id=None):
+    all_tasks = fetch_tasks()
+    day_filter = request.args.get("day")
+    if day_filter not in DAYS:
+        day_filter = None
+    tasks = tasks_on_day(all_tasks, day_filter) if day_filter else all_tasks
+    return {
+        "tasks": tasks,
+        "categories": CATEGORIES,
+        "days": DAYS,
+        "form": form or {},
+        "errors": errors or [],
+        "editing_id": editing_id,
+        "selected_day": day_filter,
+        "day_counts": {d: len(tasks_on_day(all_tasks, d)) for d in DAYS},
+        "total_tasks": len(all_tasks),
+    }
+
+
 @app.route("/admin")
 def admin():
-    tasks = fetch_tasks()
     edit_id = request.args.get("edit", type=int)
-    return render_template(
-        "admin.html",
-        tasks=tasks,
-        categories=CATEGORIES,
-        days=DAYS,
-        form={},
-        errors=[],
-        editing_id=edit_id,
-    )
+    return render_template("admin.html", **_admin_context(editing_id=edit_id))
+
+
+def _admin_redirect():
+    day = request.args.get("day")
+    return redirect(url_for("admin", day=day) if day in DAYS else url_for("admin"))
 
 
 @app.route("/tasks", methods=["POST"])
 def create_task():
     data, errors = parse_form(request.form)
     if errors:
-        tasks = fetch_tasks()
-        return render_template(
-            "admin.html",
-            tasks=tasks,
-            categories=CATEGORIES,
-            days=DAYS,
-            form=data,
-            errors=errors,
-        ), 400
+        return render_template("admin.html", **_admin_context(form=data, errors=errors)), 400
 
     db = get_db()
     db.execute(
@@ -186,23 +197,16 @@ def create_task():
         (data["title"], data["notes"], data["category"], data["scheduled_time"], data["days_of_week"]),
     )
     db.commit()
-    return redirect(url_for("admin"))
+    return _admin_redirect()
 
 
 @app.route("/tasks/<int:task_id>/edit", methods=["POST"])
 def edit_task(task_id):
     data, errors = parse_form(request.form)
     if errors:
-        tasks = fetch_tasks()
-        return render_template(
-            "admin.html",
-            tasks=tasks,
-            categories=CATEGORIES,
-            days=DAYS,
-            form={**data, "id": task_id},
-            errors=errors,
-            editing_id=task_id,
-        ), 400
+        return render_template("admin.html", **_admin_context(
+            form={**data, "id": task_id}, errors=errors, editing_id=task_id,
+        )), 400
 
     db = get_db()
     cur = db.execute(
@@ -216,7 +220,7 @@ def edit_task(task_id):
     if cur.rowcount == 0:
         abort(404)
     db.commit()
-    return redirect(url_for("admin"))
+    return _admin_redirect()
 
 
 @app.route("/tasks/<int:task_id>/delete", methods=["POST"])
@@ -226,7 +230,7 @@ def delete_task(task_id):
     if cur.rowcount == 0:
         abort(404)
     db.commit()
-    return redirect(url_for("admin"))
+    return _admin_redirect()
 
 
 @app.route("/api/tasks")

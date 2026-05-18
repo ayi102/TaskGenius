@@ -12,6 +12,21 @@
     <a class="view-display" href="{{ url_for('display') }}" target="_blank" rel="noopener">Display ↗</a>
   </header>
 
+  <nav class="day-tabs" aria-label="Filter tasks by day">
+    <a href="{{ url_for('admin') }}"
+       class="day-tab {% if not selected_day %}is-active{% endif %}">
+      <span class="day-tab-name">All</span>
+      <span class="day-tab-count">{{ total_tasks }}</span>
+    </a>
+    {% for d in days %}
+      <a href="{{ url_for('admin', day=d) }}"
+         class="day-tab {% if selected_day == d %}is-active{% endif %}">
+        <span class="day-tab-name">{{ d|capitalize }}</span>
+        <span class="day-tab-count">{{ day_counts[d] }}</span>
+      </a>
+    {% endfor %}
+  </nav>
+
   {% if errors %}
     <div class="errors">
       {% for e in errors %}<p>{{ e }}</p>{% endfor %}
@@ -20,7 +35,7 @@
 
   <section class="card">
     <h2>Add a task</h2>
-    <form method="post" action="{{ url_for('create_task') }}" class="task-form">
+    <form method="post" action="{{ url_for('create_task', day=selected_day) }}" class="task-form">
       <label>
         <span>Title</span>
         <input type="text" name="title" required maxlength="120"
@@ -71,17 +86,26 @@
   </section>
 
   <section class="card">
-    <h2>Tasks <span class="count">{{ tasks|length }}</span></h2>
+    <h2>
+      {% if selected_day %}{{ selected_day|capitalize }} tasks{% else %}All tasks{% endif %}
+      <span class="count">{{ tasks|length }}</span>
+    </h2>
 
     {% if tasks|length == 0 %}
-      <p class="empty">No tasks yet. Add one above.</p>
+      <p class="empty">
+        {% if selected_day %}
+          Nothing scheduled for {{ selected_day|capitalize }}. Add a task above.
+        {% else %}
+          No tasks yet. Add one above.
+        {% endif %}
+      </p>
     {% else %}
       <ul class="task-list">
         {% for t in tasks %}
           {% set first_cat = (t.category.split(',')[0] if t.category else '') %}
           <li class="task-row" data-category="{{ first_cat }}">
             {% if editing_id == t.id %}
-              <form method="post" action="{{ url_for('edit_task', task_id=t.id) }}" class="task-form inline">
+              <form method="post" action="{{ url_for('edit_task', task_id=t.id, day=selected_day) }}" class="task-form inline">
                 <input type="text" name="title" required maxlength="120" value="{{ form.title or t.title }}">
                 {% set saved_cats = (t.category.split(',') if t.category else []) %}
                 {% set picked_cats = (form.category.split(',') if form.category else saved_cats) %}
@@ -115,7 +139,7 @@
                 </fieldset>
                 <div class="actions">
                   <button type="submit" class="primary">Save</button>
-                  <a class="ghost" href="{{ url_for('admin') }}">Cancel</a>
+                  <a class="ghost" href="{{ url_for('admin', day=selected_day) }}">Cancel</a>
                 </div>
               </form>
             {% else %}
@@ -137,8 +161,8 @@
                 {% endif %}
               </div>
               <div class="actions">
-                <a class="ghost" href="{{ url_for('admin') }}?edit={{ t.id }}">Edit</a>
-                <form method="post" action="{{ url_for('delete_task', task_id=t.id) }}"
+                <a class="ghost" href="{{ url_for('admin', edit=t.id, day=selected_day) }}">Edit</a>
+                <form method="post" action="{{ url_for('delete_task', task_id=t.id, day=selected_day) }}"
                       onsubmit="return confirm('Delete this task?');">
                   <button type="submit" class="danger">Delete</button>
                 </form>
