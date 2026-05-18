@@ -100,17 +100,19 @@ def init_db():
 def parse_form(form):
     title = (form.get("title") or "").strip()
     notes = (form.get("notes") or "").strip()
-    category = (form.get("category") or "").strip().lower()
     scheduled_time = (form.get("scheduled_time") or "").strip()
-    picked = [d for d in form.getlist("days") if d in DAYS]
-    # NULL = every day; only store a subset when the user actually narrowed it.
-    days_of_week = ",".join(picked) if picked and len(picked) < len(DAYS) else None
+    picked_cats = [c for c in form.getlist("categories") if c in CATEGORIES]
+    # Preserve canonical order (matches CATEGORIES tuple) so storage is stable.
+    cats_ordered = [c for c in CATEGORIES if c in picked_cats]
+    category = ",".join(cats_ordered)
+    picked_days = [d for d in form.getlist("days") if d in DAYS]
+    days_of_week = ",".join(picked_days) if picked_days and len(picked_days) < len(DAYS) else None
 
     errors = []
     if not title:
         errors.append("Title is required.")
-    if category not in CATEGORIES:
-        errors.append("Pick a valid category.")
+    if not cats_ordered:
+        errors.append("Pick at least one category.")
     if scheduled_time and not TIME_RE.match(scheduled_time):
         errors.append("Time must be HH:MM (24-hour) or blank.")
 

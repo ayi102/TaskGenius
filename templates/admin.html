@@ -27,21 +27,24 @@
                value="{{ form.title or '' }}" placeholder="e.g. Bottle feed">
       </label>
 
-      <div class="row">
-        <label class="flex-2">
-          <span>Category</span>
-          <select name="category" required>
-            <option value="" disabled {% if not form.category %}selected{% endif %}>Pick one</option>
-            {% for c in categories %}
-              <option value="{{ c }}" {% if form.category == c %}selected{% endif %}>{{ c|capitalize }}</option>
-            {% endfor %}
-          </select>
-        </label>
-        <label class="flex-1">
-          <span>Time <small>(optional)</small></span>
-          <input type="time" name="scheduled_time" value="{{ form.scheduled_time or '' }}">
-        </label>
-      </div>
+      {% set picked_cats = (form.category.split(',') if form.category else []) %}
+      <fieldset class="cats-field">
+        <legend>Categories <small>(pick one or more)</small></legend>
+        <div class="cat-grid">
+          {% for c in categories %}
+            <label class="cat-check" data-category="{{ c }}">
+              <input type="checkbox" name="categories" value="{{ c }}"
+                     {% if c in picked_cats %}checked{% endif %}>
+              <span>{{ c|capitalize }}</span>
+            </label>
+          {% endfor %}
+        </div>
+      </fieldset>
+
+      <label>
+        <span>Time <small>(optional)</small></span>
+        <input type="time" name="scheduled_time" value="{{ form.scheduled_time or '' }}">
+      </label>
 
       <label>
         <span>Notes <small>(optional)</small></span>
@@ -75,18 +78,26 @@
     {% else %}
       <ul class="task-list">
         {% for t in tasks %}
-          <li class="task-row" data-category="{{ t.category }}">
+          {% set first_cat = (t.category.split(',')[0] if t.category else '') %}
+          <li class="task-row" data-category="{{ first_cat }}">
             {% if editing_id == t.id %}
               <form method="post" action="{{ url_for('edit_task', task_id=t.id) }}" class="task-form inline">
                 <input type="text" name="title" required maxlength="120" value="{{ form.title or t.title }}">
-                <div class="row">
-                  <select name="category" required class="flex-2">
+                {% set saved_cats = (t.category.split(',') if t.category else []) %}
+                {% set picked_cats = (form.category.split(',') if form.category else saved_cats) %}
+                <fieldset class="cats-field">
+                  <legend>Categories</legend>
+                  <div class="cat-grid">
                     {% for c in categories %}
-                      <option value="{{ c }}" {% if (form.category or t.category) == c %}selected{% endif %}>{{ c|capitalize }}</option>
+                      <label class="cat-check" data-category="{{ c }}">
+                        <input type="checkbox" name="categories" value="{{ c }}"
+                               {% if c in picked_cats %}checked{% endif %}>
+                        <span>{{ c|capitalize }}</span>
+                      </label>
                     {% endfor %}
-                  </select>
-                  <input type="time" name="scheduled_time" class="flex-1" value="{{ form.scheduled_time or t.scheduled_time or '' }}">
-                </div>
+                  </div>
+                </fieldset>
+                <input type="time" name="scheduled_time" value="{{ form.scheduled_time or t.scheduled_time or '' }}">
                 <textarea name="notes" rows="2" maxlength="400">{{ form.notes if form.notes is not none else t.notes }}</textarea>
                 {% set saved = t.days_of_week.split(',') if t.days_of_week else days %}
                 {% set picked = form.days_of_week.split(',') if form.days_of_week else saved %}
@@ -111,7 +122,11 @@
               <div class="task-summary">
                 <div class="task-line">
                   <span class="time">{{ t.scheduled_time|fmt12 }}</span>
-                  <span class="category">{{ t.category }}</span>
+                  <span class="category multi">
+                    {% for c in t.category.split(',') %}
+                      <span data-category="{{ c }}">{{ c|capitalize }}</span>
+                    {% endfor %}
+                  </span>
                   <span class="title">{{ t.title }}</span>
                 </div>
                 {% if t.notes %}<p class="notes">{{ t.notes }}</p>{% endif %}

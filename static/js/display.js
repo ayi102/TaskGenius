@@ -58,6 +58,20 @@ function escape(s) {
   }[c]));
 }
 
+function splitCats(catStr) {
+  return (catStr || "").split(",").map(s => s.trim()).filter(Boolean);
+}
+
+function firstCat(catStr) {
+  return splitCats(catStr)[0] || "other";
+}
+
+function catSpans(catStr) {
+  return splitCats(catStr)
+    .map(c => `<span data-category="${escape(c)}">${escape(c)}</span>`)
+    .join('<span class="cat-sep">·</span>');
+}
+
 function pickCurrent(timed, now) {
   let best = null;
   let bestDiff = Infinity;
@@ -103,10 +117,10 @@ function renderHero(t, kind, untilMins) {
     ? `<div class="hero-notes">${escape(t.notes)}</div>`
     : "";
   return `
-    <div class="hero is-${kind}" data-category="${escape(t.category)}">
+    <div class="hero is-${kind}" data-category="${escape(firstCat(t.category))}">
       <div class="hero-meta">
         <div class="hero-time">${escape(format12hr(t.scheduled_time))}</div>
-        <div class="hero-category">${escape(t.category)}</div>
+        <div class="hero-category">${catSpans(t.category)}</div>
       </div>
       <div class="hero-main">
         <div class="hero-title">${escape(t.title)}</div>
@@ -122,9 +136,9 @@ function renderCompact(t, isPast) {
   if (isPast) classes.push("is-past");
   const notes = t.notes ? `<span class="notes">${escape(t.notes)}</span>` : "";
   return `
-    <div class="${classes.join(" ")}" data-category="${escape(t.category)}">
+    <div class="${classes.join(" ")}" data-category="${escape(firstCat(t.category))}">
       <div class="time">${escape(format12hr(t.scheduled_time))}</div>
-      <div class="category">${escape(t.category)}</div>
+      <div class="category">${catSpans(t.category)}</div>
       <div class="body">
         <span class="title">${escape(t.title)}</span>
         ${notes}
@@ -135,8 +149,8 @@ function renderCompact(t, isPast) {
 
 function renderChip(t) {
   return `
-    <div class="chip" data-category="${escape(t.category)}">
-      <span class="category">${escape(t.category)}</span>
+    <div class="chip" data-category="${escape(firstCat(t.category))}">
+      <span class="category">${catSpans(t.category)}</span>
       <span class="title">${escape(t.title)}</span>
     </div>
   `;
@@ -183,7 +197,7 @@ function renderDayEntry(t) {
   const classes = ["day-entry"];
   if (!t.scheduled_time) classes.push("untimed");
   return `
-    <div class="${classes.join(" ")}" data-category="${escape(t.category)}">
+    <div class="${classes.join(" ")}" data-category="${escape(firstCat(t.category))}">
       <span class="time">${escape(time)}</span>
       <span class="title">${escape(t.title)}</span>
     </div>

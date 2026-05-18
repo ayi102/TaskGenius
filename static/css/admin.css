@@ -246,6 +246,90 @@ button.danger {
 
 .task-form.inline { gap: 0.5rem; }
 
+/* ─── Category checkboxes ─── */
+
+.cats-field {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.cats-field legend {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 0.3rem;
+  padding: 0;
+}
+
+.cats-field legend small {
+  font-weight: 400;
+  font-size: 0.85em;
+}
+
+.cat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(5.5rem, 1fr));
+  gap: 0.35rem;
+}
+
+.cat-check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0.55rem 0.4rem;
+  border: 1px solid var(--border);
+  border-radius: 0.45rem;
+  background: var(--surface);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  user-select: none;
+  transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+}
+
+.cat-check input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cat-check[data-category="idris"]:has(input:checked)    { background: #e6f1fb; color: var(--idris);    border-color: var(--idris); }
+.cat-check[data-category="elina"]:has(input:checked)    { background: #fbe6ee; color: var(--elina);    border-color: var(--elina); }
+.cat-check[data-category="jenin"]:has(input:checked)    { background: #def4ee; color: var(--jenin);    border-color: var(--jenin); }
+.cat-check[data-category="kitchen"]:has(input:checked)  { background: #fbeede; color: var(--kitchen);  border-color: var(--kitchen); }
+.cat-check[data-category="cleaning"]:has(input:checked) { background: #e2f1e7; color: var(--cleaning); border-color: var(--cleaning); }
+.cat-check[data-category="therapy"]:has(input:checked)  { background: #ddf1f1; color: var(--therapy);  border-color: var(--therapy); }
+.cat-check[data-category="other"]:has(input:checked)    { background: #ede4fa; color: var(--other);    border-color: var(--other); }
+
+/* Multi-category badge in task list */
+.task-line .category.multi {
+  display: inline-flex;
+  gap: 0.25rem;
+  background: transparent;
+  padding: 0;
+}
+
+.task-line .category.multi > span {
+  display: inline-block;
+  padding: 0.1rem 0.45rem;
+  border-radius: 0.3rem;
+  font-size: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  font-weight: inherit;
+}
+
+.task-line .category.multi > span[data-category="idris"]    { color: var(--idris);    background: #e6f1fb; }
+.task-line .category.multi > span[data-category="elina"]    { color: var(--elina);    background: #fbe6ee; }
+.task-line .category.multi > span[data-category="jenin"]    { color: var(--jenin);    background: #def4ee; }
+.task-line .category.multi > span[data-category="kitchen"]  { color: var(--kitchen);  background: #fbeede; }
+.task-line .category.multi > span[data-category="cleaning"] { color: var(--cleaning); background: #e2f1e7; }
+.task-line .category.multi > span[data-category="therapy"]  { color: var(--therapy);  background: #ddf1f1; }
+.task-line .category.multi > span[data-category="other"]    { color: var(--other);    background: #ede4fa; }
+
 /* ─── Day-of-week checkboxes ─── */
 
 .days-field {
