@@ -124,8 +124,8 @@
                     {% endfor %}
                   </div>
                 </fieldset>
-                <input type="time" name="scheduled_time" value="{{ form.scheduled_time or t.scheduled_time or '' }}">
-                <textarea name="notes" rows="2" maxlength="400">{{ form.notes if form.notes is not none else t.notes }}</textarea>
+                <input type="time" name="scheduled_time" value="{{ form.scheduled_time if 'scheduled_time' in form else (t.scheduled_time or '') }}">
+                <textarea name="notes" rows="2" maxlength="400">{{ form.notes if 'notes' in form else t.notes }}</textarea>
                 {% set saved = t.days_of_week.split(',') if t.days_of_week else days %}
                 {% set picked = form.days_of_week.split(',') if form.days_of_week else saved %}
                 <fieldset class="days-field">
